@@ -6,7 +6,7 @@ from sklearn.linear_model import Lasso
 from sklearn import preprocessing
 
 # Data import from folder
-data_set = np.array(pd.read_csv("../data/train.csv"), dtype=np.longdouble)
+data_set = np.array(pd.read_csv(".../data/train.csv"), dtype=np.longdouble)
 
 # Data division into X abd Y
 Y_set = data_set[:, 1]
