@@ -5,7 +5,8 @@ from sklearn.model_selection import KFold
 from sklearn.linear_model import Lasso
 
 # Data import from folder
-data_set = np.array(pd.read_csv("/Users/albertocenedese/Documents/Python/IML/Task_1b/train.csv"),dtype=np.float64)
+# !! use the relative path
+data_set = np.array(pd.read_csv("../../data/train.csv"), dtype=np.float64)
 print(type(data_set))
 
 # Data division into X abd Y
@@ -13,18 +14,17 @@ Y = data_set[:, 1]
 X_set = data_set[:, 2:]
 
 # Definition of the non linear features
-non_lin_f = {"squared" : lambda x: np.power(x,2),
-        "exp" : lambda x: np.exp(x),
-        "cos" : lambda x: np.cos(x)
-       }
+non_lin_f = {"squared": lambda x: np.power(x, 2),
+             "exp": lambda x: np.exp(x),
+             "cos": lambda x: np.cos(x)
+             }
 
 # Modification of the features:
-X = X_set # First feature, linear
-for key in non_lin_f: #Loop over the features in order to modify the data
+X = X_set  # First feature, linear
+for key in non_lin_f:  # Loop over the features in order to modify the data
     X = np.column_stack((X, np.array(non_lin_f[key](X_set))))
 
-X = np.column_stack((X, np.ones(700))) # paconstant part, w_0
-
+X = np.column_stack((X, np.ones(700)))  # paconstant part, w_0
 
 # Train - k fold validation and lasso regression:
 N_fold = 10
@@ -48,12 +48,11 @@ for lbda_ind in np.arange(lambda_range.shape[0]):
         reg.fit(X_train, Y_train)
         # Save the tempRMSE
         tempRMSE = np.append(tempRMSE, mean_squared_error(Y_test, reg.predict(X_test)) ** 0.5)
-    RMSEfield[lbda_ind] = np.mean(tempRMSE) #Mean of the RMSE for a given lambda
-    print(reg.coef_) # Print of the coef
-
+    RMSEfield[lbda_ind] = np.mean(tempRMSE)  # Mean of the RMSE for a given lambda
+    print(reg.coef_)  # Print of the coef
 
 # Optimal Value
-lb_opt = np.argmin(RMSEfield) # find the index of the optimal value
+lb_opt = np.argmin(RMSEfield)  # find the index of the optimal value
 print("lamda opt: ", lambda_range[lb_opt])
 print(RMSEfield)
 
@@ -64,4 +63,4 @@ w = reg.coef_
 
 # Save
 submSet = pd.DataFrame(w)
-submSet.to_csv('/Users/albertocenedese/Documents/Python/IML/Task_1b/submission_w4.csv', header=False, index=False)
+submSet.to_csv('../submission_w4.csv', header=False, index=False)
