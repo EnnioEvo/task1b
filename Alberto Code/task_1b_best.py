@@ -35,6 +35,7 @@ print(np.tile(X_mean, (700, 1)).shape)
 print(np.tile(X_std, (700, 1)).shape)
 
 X_hat = (X - np.tile(X_mean, (700, 1))) / np.tile(X_std, (700, 1))
+X_hat = np.column_stack((X_hat, np.ones([700, 1])))        #linear to affine regression
 Y_hat = (Y_set - Y_mean) / Y_std
 
 # Train - k fold validation and lasso regression:
@@ -55,7 +56,7 @@ for lbda_ind in np.arange(lambda_range.shape[0]):
         X_train, X_test = X_hat[train_index], X_hat[test_index]
         Y_train, Y_test = Y_hat[train_index], Y_hat[test_index]
         # Test
-        reg = Lasso(alpha=lbda, fit_intercept=False, tol=0.0001)
+        reg = Lasso(alpha=lbda, fit_intercept=False, tol=1e-4)
         reg.fit(X_train, Y_train)
         # Save the tempRMSE
         tempRMSE = np.append(tempRMSE, mean_squared_error(Y_test, reg.predict(X_test)) ** 0.5)
@@ -68,12 +69,12 @@ print("lamda opt: ", lambda_range[lb_opt])
 print(RMSEfield)
 
 # Final Train:
-reg = Lasso(alpha=lambda_range[lb_opt], fit_intercept=False, tol=0.000001)
+reg = Lasso(alpha=lambda_range[lb_opt], fit_intercept=False, tol=1e-6)
 reg.fit(X_hat, Y_hat)
 w = reg.coef_
 
-w_1 = w * Y_std / X_std
-w_f = Y_mean - (np.dot(w_1.T, (X_mean/X_std))) * Y_std
+w_1 = w[:-1] * Y_std / X_std
+w_f = w[-1]*Y_std + Y_mean - (np.dot(w_1.T, (X_mean / X_std))) * Y_std
 
 print(pd.DataFrame(np.append(w_1, w_f)))
 # Save
