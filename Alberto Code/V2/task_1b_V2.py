@@ -57,7 +57,7 @@ print("lamda opt: ", lambda_range[lb_opt])
 print(RMSEfield)
 
 # Final Train:
-reg = Lasso(alpha=lambda_range[lb_opt], fit_intercept=False, tol=0.000001)
+reg = Lasso(alpha=lambda_range[lb_opt], fit_intercept=False, tol=1e-6)
 reg.fit(X, Y)
 w = reg.coef_
 

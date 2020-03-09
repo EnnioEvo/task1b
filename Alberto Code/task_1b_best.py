@@ -6,7 +6,7 @@ from sklearn.linear_model import Lasso
 from sklearn import preprocessing
 
 # Data import from folder
-data_set = np.array(pd.read_csv("/Users/albertocenedese/Documents/Python/IML/Task_1b/train.csv"), dtype=np.float128)
+data_set = np.array(pd.read_csv("../data/train.csv"), dtype=np.longdouble)
 
 # Data division into X abd Y
 Y_set = data_set[:, 1]
@@ -23,7 +23,7 @@ X = X_set  # First feature, linear
 for key in non_lin_f:  # Loop over the features in order to modify the data
     X = np.column_stack((X, np.array(non_lin_f[key](X_set))))
 
-#X = np.column_stack((X, np.ones(700)))  # constant part, w_0
+# X = np.column_stack((X, np.ones(700)))  # constant part, w_0
 print(X.shape)
 
 # Normalization 
@@ -31,12 +31,11 @@ Y_mean = np.mean(Y_set)
 Y_std = np.std(Y_set)
 X_mean = np.mean(X, axis=0)
 X_std = np.std(X, axis=0)
-print(np.tile(X_mean, (700,1)).shape)
-print(np.tile(X_std, (700,1)).shape)
+print(np.tile(X_mean, (700, 1)).shape)
+print(np.tile(X_std, (700, 1)).shape)
 
-X_hat = (X - np.tile(X_mean, (700,1)))/np.tile(X_std, (700,1))
-Y_hat = (Y_set - Y_mean)/Y_std
-
+X_hat = (X - np.tile(X_mean, (700, 1))) / np.tile(X_std, (700, 1))
+Y_hat = (Y_set - Y_mean) / Y_std
 
 # Train - k fold validation and lasso regression:
 N_fold = 10
@@ -73,11 +72,10 @@ reg = Lasso(alpha=lambda_range[lb_opt], fit_intercept=False, tol=0.000001)
 reg.fit(X_hat, Y_hat)
 w = reg.coef_
 
-w_1 = w * Y_std / X_std 
-w_f = Y_mean - (np.dot(w_1.T, X_mean))*Y_std
+w_1 = w * Y_std / X_std
+w_f = Y_mean - (np.dot(w_1.T, (X_mean/X_std))) * Y_std
 
 print(pd.DataFrame(np.append(w_1, w_f)))
 # Save
 submSet = pd.DataFrame(np.append(w_1, w_f))
-submSet.to_csv('/Users/albertocenedese/Documents/Python/IML/Task_1b/submission_w5.csv', header=False, index=False)
-
+submSet.to_csv('submission_w5.csv', header=False, index=False)
